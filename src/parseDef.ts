@@ -50,7 +50,7 @@ type JsonSchema7Meta = {
   default?: any;
   description?: string;
   markdownDescription?: string;
-  example?: unknown;
+  examples?: unknown[];
 };
 
 export type JsonSchema7TypeUnion =
@@ -81,17 +81,22 @@ export type JsonSchema7TypeUnion =
 
 export type JsonSchema7Type = JsonSchema7TypeUnion & JsonSchema7Meta;
 
-type ZodTypeDefExtended = ZodTypeDef & { title?: string; example?: unknown };
+type ZodTypeDefExtended = ZodTypeDef & { title?: string; examples?: unknown[] };
 
 export function parseDef(
   def: ZodTypeDefExtended,
   refs: Refs,
-  forceResolution = false, // Forces a new schema to be instantiated even though its def has been seen. Used for improving refs in definitions. See https://github.com/StefanTerdell/zod-to-json-schema/pull/61.
+  forceResolution = false // Forces a new schema to be instantiated even though its def has been seen. Used for improving refs in definitions. See https://github.com/StefanTerdell/zod-to-json-schema/pull/61.
 ): JsonSchema7Type | undefined {
   const seenItem = refs.seen.get(def);
 
   if (refs.override) {
-    const overrideResult = refs.override?.(def, refs, seenItem, forceResolution);
+    const overrideResult = refs.override?.(
+      def,
+      refs,
+      seenItem,
+      forceResolution
+    );
 
     if (overrideResult !== ignoreOverride) {
       return overrideResult;
@@ -123,7 +128,7 @@ export function parseDef(
 
 const get$ref = (
   item: Seen,
-  refs: Refs,
+  refs: Refs
 ):
   | {
       $ref: string;
@@ -143,8 +148,8 @@ const get$ref = (
       ) {
         console.warn(
           `Recursive reference detected at ${refs.currentPath.join(
-            "/",
-          )}! Defaulting to any`,
+            "/"
+          )}! Defaulting to any`
         );
 
         return {};
@@ -166,7 +171,7 @@ const getRelativePath = (pathA: string[], pathB: string[]) => {
 const selectParser = (
   def: any,
   typeName: ZodFirstPartyTypeKind,
-  refs: Refs,
+  refs: Refs
 ): JsonSchema7Type | undefined => {
   switch (typeName) {
     case ZodFirstPartyTypeKind.ZodString:
@@ -245,7 +250,7 @@ const selectParser = (
 const addMeta = (
   def: ZodTypeDefExtended,
   refs: Refs,
-  jsonSchema: JsonSchema7Type,
+  jsonSchema: JsonSchema7Type
 ): JsonSchema7Type => {
   if (def.description) {
     jsonSchema.description = def.description;
@@ -259,8 +264,8 @@ const addMeta = (
     jsonSchema.title = def.title;
   }
 
-  if (def.example) {
-    jsonSchema.example = def.example;
+  if (def.examples) {
+    jsonSchema.examples = def.examples;
   }
 
   return jsonSchema;

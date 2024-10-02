@@ -167,8 +167,8 @@ const addMeta = (def, refs, jsonSchema) => {
     if (def.title) {
         jsonSchema.title = def.title;
     }
-    if (def.example) {
-        jsonSchema.example = def.example;
+    if (def.examples) {
+        jsonSchema.examples = def.examples;
     }
     return jsonSchema;
 };
