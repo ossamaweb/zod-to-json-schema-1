@@ -150,6 +150,7 @@ const selectParser = (def, typeName, refs) => {
         case ZodFirstPartyTypeKind.ZodSymbol:
             return undefined;
         default:
+            /* c8 ignore next */
             return ((_) => undefined)(typeName);
     }
 };
